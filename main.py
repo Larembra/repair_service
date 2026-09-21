@@ -1,12 +1,10 @@
 """Сервис поиска специалистов по ремонту — точка запуска."""
-from datetime import date
 from typing import Any
 
-from clients import add_client, find_client_by_name, get_client_info
+from clients import add_client
 from repair_requests import (
     cancel_request,
     create_request,
-    filter_requests_by_status,
     get_requests_statistics,
     get_request_status,
     is_specialist_available,
@@ -14,16 +12,12 @@ from repair_requests import (
 from services import (
     add_service,
     calculate_cost,
-    find_services_by_name,
     get_service_info,
 )
 from specialists import (
     add_specialist,
     check_specialist_availability,
-    filter_specialists_by_rate,
-    find_specialists_by_specialization,
     get_specialist_info,
-    sort_specialists_by_rate,
 )
 from storage import load_data, save_data
 from utils import input_date, input_float, input_int, input_non_empty
