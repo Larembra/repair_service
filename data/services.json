@@ -1,0 +1,12 @@
+{
+    "1": {
+        "name": "Устранение протечки крана",
+        "required_specialization": "Сантехник",
+        "hours": 2.0
+    },
+    "2": {
+        "name": "Замена розетки",
+        "required_specialization": "Электрик",
+        "hours": 1.0
+    }
+}
