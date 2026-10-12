@@ -1,0 +1,1 @@
+"""Django repair request app."""

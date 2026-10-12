@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Специалисты — Ремонт рядом{% endblock %}
+{% block content %}
+<h1>Специалисты</h1>
+<p>Всего специалистов: {{ specialists|length }}</p>
+<div class="row">
+    {% for specialist in specialists %}
+        <div class="col-md-6 col-lg-4">
+            {% include "specialists/includes/specialist_card.html" %}
+        </div>
+    {% empty %}
+        <p>Специалистов пока нет.</p>
+    {% endfor %}
+</div>
+{% endblock %}

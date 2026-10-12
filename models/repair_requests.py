@@ -109,6 +109,14 @@ def find_request_by_id(
     return None
 
 
+def find_requests_by_id(
+    requests: list[RepairRequest],
+    request_id: int,
+) -> Optional[RepairRequest]:
+    """Совместимое имя поиска заявки, используемое веб-приложением."""
+    return find_request_by_id(requests, request_id)
+
+
 def cancel_request(
     requests: list[RepairRequest],
     request_id: int,

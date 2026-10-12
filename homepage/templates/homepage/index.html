@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Поиск мастеров для ремонта{% endblock %}
+{% block content %}
+<section class="hero-panel p-4 p-md-5 rounded-3">
+    <h1 class="display-5">Найдите специалиста для ремонта</h1>
+    <p class="lead">Каталог мастеров и заявок сервиса в одном месте.</p>
+    <a class="btn btn-primary me-2" href="{% url 'specialists:list' %}">Специалисты</a>
+    <a class="btn btn-outline-primary" href="{% url 'repair_requests:list' %}">Заявки</a>
+</section>
+{% endblock %}

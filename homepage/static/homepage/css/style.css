@@ -1,0 +1,55 @@
+:root {
+    color-scheme: light;
+    --brand: #145b50;
+    --brand-soft: #eaf4f1;
+}
+
+body {
+    min-height: 100vh;
+    background: #f8faf9;
+    color: #1c2926;
+}
+
+.site-header {
+    background: white;
+    border-bottom: 1px solid #dce7e3;
+}
+
+.brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    color: var(--brand);
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.site-logo {
+    width: 48px;
+    height: 48px;
+}
+
+.hero-panel {
+    background: var(--brand-soft);
+}
+
+.specialist-card,
+.request-card {
+    margin-bottom: 1rem;
+    border-color: #dce7e3;
+    border-radius: .75rem;
+    box-shadow: 0 .15rem .5rem #163b3210;
+}
+
+.request-status {
+    font-weight: 600;
+}
+
+.request-status-cancelled {
+    opacity: .85;
+}
+
+footer {
+    color: #687671;
+}

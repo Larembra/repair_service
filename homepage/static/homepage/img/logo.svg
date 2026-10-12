@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ремонт рядом">
+  <rect width="64" height="64" rx="16" fill="#145b50"/>
+  <path d="M14 31 32 15l18 16v18H37V37H27v12H14z" fill="#fff"/>
+  <path d="m43 16 5-5 8 8-5 5" fill="none" stroke="#f4b942" stroke-width="4" stroke-linecap="round"/>
+</svg>

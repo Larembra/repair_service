@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from typing import Any, Callable, TypeVar
 
 from models import Client, RepairRequest, Service, Specialist
@@ -7,7 +8,7 @@ from models.clients import find_client_by_id
 from models.services import find_service_by_id
 from models.specialists import find_specialist_by_id
 
-DATA_DIR = "data"
+DATA_DIR = Path(__file__).resolve().parent / "data"
 CLIENTS_FILE = "clients.json"
 SPECIALISTS_FILE = "specialists.json"
 SERVICES_FILE = "services.json"
@@ -16,16 +17,20 @@ REQUESTS_FILE = "requests.json"
 T = TypeVar("T")
 
 
+def _data_path(filename: str) -> Path:
+    return Path(DATA_DIR) / filename
+
+
 def _ensure_data_dir() -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
+    Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
 
 
 def load_data(filename: str, default: Any) -> Any:
-    path = os.path.join(DATA_DIR, filename)
+    path = _data_path(filename)
     if not os.path.exists(path):
         return default
     try:
-        with open(path, "r", encoding="utf-8") as file:
+        with path.open("r", encoding="utf-8") as file:
             return json.load(file)
     except (json.JSONDecodeError, OSError) as error:
         print(f"Предупреждение: не удалось прочитать {filename}: {error}")
@@ -34,9 +39,9 @@ def load_data(filename: str, default: Any) -> Any:
 
 def save_data(filename: str, data: Any) -> None:
     _ensure_data_dir()
-    path = os.path.join(DATA_DIR, filename)
+    path = _data_path(filename)
     try:
-        with open(path, "w", encoding="utf-8") as file:
+        with path.open("w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
     except OSError as error:
         print(f"Ошибка сохранения {filename}: {error}")

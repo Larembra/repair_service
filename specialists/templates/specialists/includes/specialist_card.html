@@ -1,0 +1,9 @@
+<article class="card specialist-card mb-3">
+    <div class="card-body">
+        <h2 class="h5 card-title">
+            <a href="{% url 'specialists:detail' specialist.id %}">{{ specialist.name|default:"Имя не указано" }}</a>
+        </h2>
+        <p>{{ specialist.specialization|default:"Специализация не указана" }}</p>
+        <p class="mb-0">{{ specialist.rate }} руб./час</p>
+    </div>
+</article>

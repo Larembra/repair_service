@@ -1,0 +1,1 @@
+"""Django specialist catalog app."""

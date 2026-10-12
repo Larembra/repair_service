@@ -1,0 +1,5 @@
+{% if item.is_cancelled %}
+    <span class="badge bg-secondary request-status request-status-cancelled">{{ item.status|default:"Отменена" }}</span>
+{% else %}
+    <span class="badge bg-success request-status request-status-active">{{ item.status|default:"Новая" }}</span>
+{% endif %}

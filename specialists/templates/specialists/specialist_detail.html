@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ specialist.name|default:"Специалист" }} — Ремонт рядом{% endblock %}
+{% block content %}
+<article class="card specialist-card">
+    <div class="card-body">
+        <h1>{{ specialist.name|default:"Имя не указано" }}</h1>
+        <p>Специализация: {{ specialist.specialization|default:"Не указана" }}</p>
+        <p>Ставка: {{ specialist.rate }} руб./час</p>
+        <a class="btn btn-outline-secondary" href="{% url 'specialists:list' %}">К списку специалистов</a>
+    </div>
+</article>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Заявка не найдена{% endblock %}
+{% block content %}
+<h1 class="text-danger">Заявка не найдена</h1>
+<a href="{% url 'repair_requests:list' %}">К списку заявок</a>
+{% endblock %}
