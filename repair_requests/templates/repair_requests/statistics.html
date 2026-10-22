@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Статистика заявок — Ремонт рядом{% endblock %}
+{% block content %}
+<h1>Статистика заявок</h1>
+<p>Всего заявок: {{ totals.total|default:0 }}; активных: {{ totals.active|default:0 }}</p>
+<h2 class="h4 mt-4">По статусам</h2>
+<ul class="list-group mb-4">
+    {% for row in status_counts %}
+        <li class="list-group-item">{% if row.is_cancelled %}Отменённые{% else %}Активные{% endif %}: {{ row.request_count }}</li>
+    {% empty %}<li class="list-group-item">Данных пока нет.</li>
+    {% endfor %}
+</ul>
+<h2 class="h4">Заявки по специалистам</h2>
+<ul class="list-group">
+    {% for row in specialist_counts %}
+        <li class="list-group-item d-flex justify-content-between">{{ row.specialist_name }}<span>{{ row.request_count }}</span></li>
+    {% empty %}<li class="list-group-item">Специалистов пока нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

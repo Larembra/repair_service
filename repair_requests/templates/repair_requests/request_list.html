@@ -7,12 +7,12 @@
     {% for item in requests %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <a href="{% url 'repair_requests:detail' item.id %}">
-                Заявка №{{ item.id }}: {{ item.service.name|default:"Услуга не указана" }} — {{ item.request_date|date:"d.m.Y" }}
+                Заявка №{{ item.id }}: {{ item.service_name|default:"Услуга не указана" }} — {{ item.request_date|date:"d.m.Y" }}
             </a>
-            {% include "repair_requests/includes/request_status.html" %}
+            {% if item.is_cancelled %}<span class="badge bg-secondary request-status request-status-cancelled">Отменена</span>
+            {% else %}<span class="badge bg-success request-status request-status-active">Новая</span>{% endif %}
         </li>
-    {% empty %}
-        <li class="list-group-item">Заявок пока нет.</li>
+    {% empty %}<li class="list-group-item">Заявок пока нет.</li>
     {% endfor %}
 </ul>
 {% endblock %}
