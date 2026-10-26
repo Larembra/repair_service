@@ -5,6 +5,7 @@
 <p>Всего заявок: {{ requests|length }}</p>
 <ul class="list-group">
     {% for item in requests %}
+        <p>Клиент: {{ item.client_name }}</p>
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <a href="{% url 'repair_requests:detail' item.id %}">
                 Заявка №{{ item.id }}: {{ item.service_name|default:"Услуга не указана" }} — {{ item.request_date|date:"d.m.Y" }}
