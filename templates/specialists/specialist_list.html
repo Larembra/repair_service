@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Специалисты — Ремонт рядом{% endblock %}
+{% block content %}
+<h1 class="mb-4">Специалисты по ремонту</h1>
+<p><a class="btn btn-primary" href="{% url 'specialists:search' %}">Подобрать специалиста</a></p>
+<div class="row g-3">
+{% for specialist in specialists %}
+    <div class="col-md-6 col-lg-4"><article class="card h-100"><div class="card-body">
+        <h2 class="h5"><a href="{% url 'specialists:detail' specialist.pk %}">{{ specialist.name }}</a></h2>
+        <p>{{ specialist.specialization }}</p><p class="mb-0">Ставка: {{ specialist.rate }} руб./ч</p>
+    </div></article></div>
+{% empty %}<p>Специалисты пока не добавлены.</p>{% endfor %}
+</div>
+{% endblock %}

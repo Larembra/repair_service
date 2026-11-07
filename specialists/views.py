@@ -1,16 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
-from db.database import get_connection
-from models.specialists import find_specialist_by_id
-from storage import load_specialists
+from specialists.models import Specialist
 
 
 def specialist_list(request):
-    with get_connection() as connection:
-        specialists = connection.execute(
-            "SELECT id, name, specialization, rate "
-            "FROM specialists ORDER BY rate"
-        ).fetchall()
+    specialists = Specialist.objects.all()
     return render(request, "specialists/specialist_list.html", {
         "specialists": specialists,
     })
@@ -19,23 +13,21 @@ def specialist_list(request):
 def specialist_search(request):
     specialization = request.GET.get("specialization", "").strip()
     max_rate = request.GET.get("max_rate", "").strip()
-    results = []
+    results = Specialist.objects.none()
     error = ""
     if specialization or max_rate:
-        query = (
-            "SELECT id, name, specialization, rate FROM specialists "
-            "WHERE (? = '' OR specialization = ? COLLATE NOCASE) "
-            "AND (? = '' OR rate <= ?) ORDER BY rate"
-        )
         try:
             rate_value = float(max_rate) if max_rate else None
             if rate_value is not None and rate_value <= 0:
                 raise ValueError
-            with get_connection() as connection:
-                results = connection.execute(
-                    query, (specialization, specialization, max_rate,
-                            rate_value),
-                ).fetchall()
+            results = Specialist.objects.all()
+            if specialization:
+                results = results.filter(
+                    specialization__iexact=specialization,
+                )
+            if rate_value is not None:
+                results = results.filter(rate__lte=rate_value)
+            results = results.order_by("rate", "id")
         except ValueError:
             error = "Укажите положительную максимальную ставку."
     return render(request, "specialists/specialist_search.html", {
@@ -48,9 +40,7 @@ def specialist_search(request):
 
 
 def specialist_detail(request, specialist_id: int):
-    specialist = find_specialist_by_id(load_specialists(), specialist_id)
-    if specialist is None:
-        return render(request, "specialists/not_found.html", status=404)
+    specialist = get_object_or_404(Specialist, pk=specialist_id)
     return render(request, "specialists/specialist_detail.html", {
         "specialist": specialist,
     })

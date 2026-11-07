@@ -1,57 +1,82 @@
-from django.shortcuts import render
+from datetime import datetime
 
-from db.database import get_connection
-from models.repair_requests import find_request_by_id
-from storage import (
-    load_clients,
-    load_requests,
-    load_services,
-    load_specialists,
-)
+from django.core.paginator import Paginator
+from django.db.models import Count
+from django.shortcuts import get_object_or_404, render
 
-
-def _load_domain_requests():
-    clients = load_clients()
-    specialists = load_specialists()
-    services = load_services()
-    return load_requests(clients, specialists, services)
+from homepage.models import Client
+from repair_requests.models import RepairRequest, Service
+from specialists.models import Specialist
 
 
 def request_list(request):
-    with get_connection() as connection:
-        items = connection.execute(
-            "SELECT r.id, r.request_date, r.is_cancelled, "
-            "c.name AS client_name, sp.name AS specialist_name, "
-            "sv.name AS service_name, sp.rate, sv.hours "
-            "FROM repair_requests AS r "
-            "JOIN clients AS c ON c.id = r.client_id "
-            "JOIN specialists AS sp ON sp.id = r.specialist_id "
-            "JOIN services AS sv ON sv.id = r.service_id "
-            "ORDER BY r.request_date DESC"
-        ).fetchall()
+    request_date = request.GET.get("date", "").strip()
+    client_id = request.GET.get("client", "").strip()
+    specialist_id = request.GET.get("specialist", "").strip()
+    service_id = request.GET.get("service", "").strip()
+    status = request.GET.get("status", "").strip()
+    sort = request.GET.get("sort", "date")
+    error = ""
+
+    items = RepairRequest.objects.select_related(
+        "client", "specialist", "service",
+    )
+    if request_date:
+        try:
+            selected_date = datetime.strptime(
+                request_date, "%Y-%m-%d",
+            ).date()
+        except ValueError:
+            error = "Укажите корректную дату."
+        else:
+            items = items.filter(request_date=selected_date)
+    if client_id.isdigit():
+        items = items.filter(client_id=int(client_id))
+    if specialist_id.isdigit():
+        items = items.filter(specialist_id=int(specialist_id))
+    if service_id.isdigit():
+        items = items.filter(service_id=int(service_id))
+    if status == "active":
+        items = items.filter(is_cancelled=False)
+    elif status == "cancelled":
+        items = items.filter(is_cancelled=True)
+
+    sort_fields = {
+        "date": "request_date",
+        "client": "client__name",
+        "specialist": "specialist__name",
+        "service": "service__name",
+    }
+    items = items.order_by(sort_fields.get(sort, "request_date"), "id")
+    paginator = Paginator(items, 5)
+    page_obj = paginator.get_page(request.GET.get("page"))
     return render(request, "repair_requests/request_list.html", {
-        "requests": items,
+        "requests": page_obj,
+        "page_obj": page_obj,
+        "request_date": request_date,
+        "selected_client": client_id,
+        "selected_specialist": specialist_id,
+        "selected_service": service_id,
+        "status": status,
+        "sort": sort if sort in sort_fields else "date",
+        "clients": Client.objects.order_by("name"),
+        "specialists": Specialist.objects.order_by("name"),
+        "services": Service.objects.order_by("name"),
+        "error": error,
     })
 
 
 def request_statistics(request):
-    with get_connection() as connection:
-        status_counts = connection.execute(
-            "SELECT is_cancelled, COUNT(*) AS request_count "
-            "FROM repair_requests GROUP BY is_cancelled"
-        ).fetchall()
-        specialist_counts = connection.execute(
-            "SELECT sp.name AS specialist_name, "
-            "COUNT(r.id) AS request_count "
-            "FROM specialists AS sp "
-            "LEFT JOIN repair_requests AS r ON r.specialist_id = sp.id "
-            "GROUP BY sp.id, sp.name ORDER BY request_count DESC, sp.name"
-        ).fetchall()
-        totals = connection.execute(
-            "SELECT COUNT(*) AS total, "
-            "SUM(CASE WHEN is_cancelled = 0 THEN 1 ELSE 0 END) AS active "
-            "FROM repair_requests"
-        ).fetchone()
+    status_counts = RepairRequest.objects.values(
+        "is_cancelled",
+    ).annotate(request_count=Count("id")).order_by("is_cancelled")
+    specialist_counts = Specialist.objects.annotate(
+        request_count=Count("repair_requests"),
+    ).values("name", "request_count").order_by("-request_count", "name")
+    totals = {
+        "total": RepairRequest.objects.count(),
+        "active": RepairRequest.objects.filter(is_cancelled=False).count(),
+    }
     return render(request, "repair_requests/statistics.html", {
         "status_counts": status_counts,
         "specialist_counts": specialist_counts,
@@ -60,10 +85,11 @@ def request_statistics(request):
 
 
 def request_detail(request, request_id: int):
-    item = find_request_by_id(_load_domain_requests(), request_id)
-    if item is None:
-        return render(request, "repair_requests/not_found.html", status=404)
-    cost = item.service.calculate_cost(item.specialist.rate)
+    requests = RepairRequest.objects.select_related(
+        "client", "specialist", "service",
+    )
+    item = get_object_or_404(requests, pk=request_id)
+    cost = item.estimated_cost
     return render(request, "repair_requests/request_detail.html", {
         "item": item,
         "cost": cost,

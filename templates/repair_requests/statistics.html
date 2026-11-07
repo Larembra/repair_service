@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Статистика — Ремонт рядом{% endblock %}
+{% block content %}
+<h1 class="mb-4">Статистика заявок</h1>
+<p>Всего заявок: {{ totals.total }} · Активных: {{ totals.active }}</p>
+<h2 class="h4">По статусам</h2><ul>{% for row in status_counts %}<li>{% if row.is_cancelled %}Отменённые{% else %}Новые{% endif %}: {{ row.request_count }}</li>{% empty %}<li>Заявок пока нет.</li>{% endfor %}</ul>
+<h2 class="h4">По специалистам</h2><ul>{% for row in specialist_counts %}<li>{{ row.name }}: {{ row.request_count }}</li>{% empty %}<li>Специалисты пока не добавлены.</li>{% endfor %}</ul>
+{% endblock %}

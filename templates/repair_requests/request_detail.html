@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Заявка №{{ item.pk }} — Ремонт рядом{% endblock %}
+{% block content %}
+<article class="card"><div class="card-body"><h1 class="h3">Заявка №{{ item.pk }}</h1><p>Дата: {{ item.request_date|date:"d.m.Y" }}</p><p>Статус: {{ item.status }}</p><p>Клиент: {{ item.client.name }} · {{ item.client.phone }}</p><p>Специалист: {{ item.specialist.name }} ({{ item.specialist.specialization }})</p><p>Услуга: {{ item.service.name }}, {{ item.service.hours }} ч.</p><p>Ориентировочная стоимость: {{ cost }} руб.</p><a class="btn btn-outline-secondary" href="{% url 'repair_requests:list' %}">К списку заявок</a></div></article>
+{% endblock %}

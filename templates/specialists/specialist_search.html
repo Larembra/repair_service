@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Подбор специалиста — Ремонт рядом{% endblock %}
+{% block content %}
+<h1 class="mb-4">Подбор специалиста</h1>
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-5"><label class="form-label" for="specialization">Специализация</label><input class="form-control" id="specialization" name="specialization" value="{{ specialization }}"></div>
+    <div class="col-md-4"><label class="form-label" for="max_rate">Максимальная ставка</label><input class="form-control" id="max_rate" name="max_rate" type="number" min="0.01" step="0.01" value="{{ max_rate }}"></div>
+    <div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary" type="submit">Найти</button></div>
+</form>
+{% if error %}<p class="text-danger">{{ error }}</p>{% endif %}
+{% if searched %}<div class="row g-3">
+{% for specialist in specialists %}<div class="col-md-6"><article class="card"><div class="card-body"><h2 class="h5"><a href="{% url 'specialists:detail' specialist.pk %}">{{ specialist.name }}</a></h2><p>{{ specialist.specialization }} · {{ specialist.rate }} руб./ч</p></div></article></div>
+{% empty %}<p>Подходящих специалистов не найдено.</p>{% endfor %}
+</div>{% endif %}
+{% endblock %}

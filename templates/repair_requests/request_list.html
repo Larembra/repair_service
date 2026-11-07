@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Заявки — Ремонт рядом{% endblock %}
+{% block content %}
+<h1 class="mb-4">Заявки на ремонт</h1>
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3"><label class="form-label" for="date">Дата</label><input class="form-control" type="date" id="date" name="date" value="{{ request_date }}"></div>
+    <div class="col-md-3"><label class="form-label" for="client">Клиент</label><select class="form-select" id="client" name="client"><option value="">Все клиенты</option>{% for client in clients %}<option value="{{ client.pk }}" {% if selected_client == client.pk|stringformat:"s" %}selected{% endif %}>{{ client.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label" for="specialist">Специалист</label><select class="form-select" id="specialist" name="specialist"><option value="">Все специалисты</option>{% for specialist in specialists %}<option value="{{ specialist.pk }}" {% if selected_specialist == specialist.pk|stringformat:"s" %}selected{% endif %}>{{ specialist.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label" for="service">Услуга</label><select class="form-select" id="service" name="service"><option value="">Все услуги</option>{% for service in services %}<option value="{{ service.pk }}" {% if selected_service == service.pk|stringformat:"s" %}selected{% endif %}>{{ service.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label" for="status">Статус</label><select class="form-select" id="status" name="status"><option value="">Любой</option><option value="active" {% if status == "active" %}selected{% endif %}>Новая</option><option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Отменена</option></select></div>
+    <div class="col-md-3"><label class="form-label" for="sort">Сортировать по</label><select class="form-select" id="sort" name="sort"><option value="date" {% if sort == "date" %}selected{% endif %}>Дате</option><option value="client" {% if sort == "client" %}selected{% endif %}>Клиенту</option><option value="specialist" {% if sort == "specialist" %}selected{% endif %}>Специалисту</option><option value="service" {% if sort == "service" %}selected{% endif %}>Услуге</option></select></div>
+    <div class="col-12"><button class="btn btn-primary" type="submit">Применить</button> <a class="btn btn-outline-secondary" href="{% url 'repair_requests:list' %}">Сбросить</a></div>
+</form>
+{% if error %}<p class="text-danger">{{ error }}</p>{% endif %}
+<div class="row g-3">
+{% for item in requests %}<div class="col-md-6"><article class="card h-100"><div class="card-body"><h2 class="h5"><a href="{% url 'repair_requests:detail' item.pk %}">Заявка №{{ item.pk }}</a></h2><p>{{ item.request_date|date:"d.m.Y" }} · {{ item.status }}</p><p>Клиент: {{ item.client.name }}</p><p>Специалист: {{ item.specialist.name }}</p><p>Услуга: {{ item.service.name }}</p><p class="mb-0">Ориентировочно: {{ item.estimated_cost }} руб.</p></div></article></div>
+{% empty %}<p>Заявок по выбранным условиям нет.</p>{% endfor %}
+</div>
+{% if page_obj.paginator.num_pages > 1 %}<nav aria-label="Навигация по страницам" class="mt-4"><ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="{% querystring page=page_obj.previous_page_number %}">Назад</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Назад</span></li>{% endif %}
+    {% for page_number in page_obj.paginator.page_range %}{% if page_number == page_obj.number %}<li class="page-item active"><span class="page-link">{{ page_number }}</span></li>{% else %}<li class="page-item"><a class="page-link" href="{% querystring page=page_number %}">{{ page_number }}</a></li>{% endif %}{% endfor %}
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="{% querystring page=page_obj.next_page_number %}">Далее</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Далее</span></li>{% endif %}
+</ul></nav>{% endif %}
+{% endblock %}
